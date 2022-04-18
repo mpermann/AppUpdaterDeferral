@@ -4,8 +4,9 @@
 # tracking. Parameter 4 is the name of the app to be patched, parameter 5 is the name of the app process, 
 # parameter 6 is the policy trigger name to install the app and parameter 7 is the number of deferrals.
 # The script is relatively basic and can't currently kill more than one process or patch more than one app.
-# Version 1.0
+# Version 1.0.1
 # Created 04-02-2022 by Michael Permann
+# Updated 04-18-2022
 
 APP_NAME=$4
 APP_PROCESS_NAME=$5
@@ -117,4 +118,3 @@ else
         fi
     fi
 fi
-
