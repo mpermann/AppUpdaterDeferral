@@ -90,7 +90,7 @@ then
     exit 0
 else
     # Check if current deferral count is not equal to max deferrals, if it is not proceed else display dialog without Cancel ($BUTTON2) button.
-    if [[ $CURRENT_DEFERRAL_COUNT != $MAX_DEFERRAL ]]
+    if [[ $CURRENT_DEFERRAL_COUNT != "$MAX_DEFERRAL" ]]
     then
         DIALOG=$(/bin/launchctl asuser "$USER_ID" /usr/bin/sudo -u "$CURRENT_USER" "$JAMF_HELPER" -windowType utility -windowPosition lr -title "$TITLE0" -description "$DESCRIPTION0" -icon "$LOGO" -button1 "$BUTTON1" -button2 "$BUTTON2" -defaultButton "$DEFAULT_BUTTON")
         if [[ "$DIALOG" = "2" && $CURRENT_DEFERRAL_COUNT < $MAX_DEFERRAL ]] # Check if the default cancel button was clicked.
