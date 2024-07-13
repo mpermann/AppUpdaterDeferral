@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Name: AppUpdaterDeferral.bash
-# Version: 1.0.6
+# Version: 1.0.7
 # Created: 04-02-2022 by Michael Permann
-# Updated: 10-21-2022
+# Updated: 07-12-2024
 # The script is for patching an app with user notification before starting, if the app is running. It supports
 # deferrals with tracking. If the app is not running, it will be silently patched without any notification to
 # the user. Parameter 4 is the name of the app to patch. Parameter 5 is the name of the app process. Parameter
