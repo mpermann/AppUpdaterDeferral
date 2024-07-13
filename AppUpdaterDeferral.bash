@@ -16,9 +16,9 @@ POLICY_TRIGGER_NAME=$6
 MAX_DEFERRAL=$7
 # Checking for app deferral plist file. If it exists, read current deferral count from file and set variable.
 # If it doesn't exist, set current deferral count to 0.
-if [ -e "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" ]
+if [ -e "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" ]
 then
-    CURRENT_DEFERRAL_COUNT=$(defaults read "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" 'CurrentDeferralCount')
+    CURRENT_DEFERRAL_COUNT=$(defaults read "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" 'CurrentDeferralCount')
     echo "Current deferral count read from plist is: $CURRENT_DEFERRAL_COUNT"
 else
     CURRENT_DEFERRAL_COUNT="0"
@@ -26,11 +26,11 @@ else
 fi
 CURRENT_USER=$(scutil <<< "show State:/Users/ConsoleUser" | awk '/Name :/ && ! /loginwindow/ { print $3 }')
 USER_ID=$(/usr/bin/id -u "$CURRENT_USER")
-LOGO="/Library/Application Support/HeartlandAEA11/Images/HeartlandLogo@512px.png"
+LOGO="/Library/Management/PCC/Images/PCC1Logo@512px.png"
 JAMF_HELPER="/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper"
 JAMF_BINARY=$(which jamf)
 TITLE0="Quit Application"
-DESCRIPTION0="Greetings Heartland Area Education Agency Staff
+DESCRIPTION0="Greetings PERMANNent Computer Consulting LLC Staff
 
 An update for $APP_NAME is available.  Please return to $APP_NAME and save your work and quit the application BEFORE returning here and clicking the \"OK\" button to proceed with the update. 
 
@@ -38,10 +38,10 @@ Caution: your work could be lost if you don't save it and quit $APP_NAME before 
 
 You may click the \"Cancel\" button to defer this update. You can defer a maximum of $MAX_DEFERRAL times. You have deferred ${CURRENT_DEFERRAL_COUNT} times.
 
-Any questions or issues please contact techsupport@heartlandaea.org.
+Any questions or issues please contact techsupport@permannentcc.com.
 Thanks!"
 TITLE1="Quit Application"
-DESCRIPTION1="Greetings Heartland Area Education Agency Staff
+DESCRIPTION1="Greetings PERMANNent Computer Consulting LLC Staff
 
 An update for $APP_NAME is available.  Please return to $APP_NAME and save your work and quit the application BEFORE returning here and clicking the \"OK\" button to proceed with the update. 
 
@@ -49,7 +49,7 @@ Caution: your work could be lost if you don't save it and quit $APP_NAME before 
 
 You can defer a maximum of $MAX_DEFERRAL times. You have deferred ${CURRENT_DEFERRAL_COUNT} times.
 
-Any questions or issues please contact techsupport@heartlandaea.org.
+Any questions or issues please contact techsupport@permannentcc.com.
 Thanks!"
 TITLE2="Update Complete"
 DESCRIPTION2="Thank You! 
@@ -59,16 +59,16 @@ BUTTON1="OK"
 BUTTON2="Cancel"
 DEFAULT_BUTTON="2"
 # Checking for app deferral plist file. If it doesn't exist, create it.
-if [ ! -e "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" ]
+if [ ! -e "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" ]
 then
-/bin/cat > "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" <<EOF
+/bin/cat > "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>MaxDeferral</key><integer>${MAX_DEFERRAL}</integer><key>CurrentDeferralCount</key><integer>0</integer></dict></plist>
 EOF
 else
 echo "File already exists. Skipping plist creation."
 fi
 
-CURRENT_DEFERRAL_COUNT=$(defaults read "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" 'CurrentDeferralCount')
+CURRENT_DEFERRAL_COUNT=$(defaults read "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" 'CurrentDeferralCount')
 APP_PROCESS_ID=$(/bin/ps ax | /usr/bin/pgrep -x "$APP_PROCESS_NAME" | /usr/bin/grep -v grep | /usr/bin/awk '{ print $1 }')
 
 echo "Current Deferral Count: $CURRENT_DEFERRAL_COUNT"
@@ -79,10 +79,10 @@ if [ -z "$APP_PROCESS_ID" ] # Check whether app is running by testing if string 
 then 
     echo "App NOT running, so silently install app."
     "$JAMF_BINARY" policy -event "$POLICY_TRIGGER_NAME"
-    if [ -e "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" ]
+    if [ -e "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" ]
     then
         echo "Deferral file exists and needs removed."
-        rm -rf "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" 
+        rm -rf "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" 
     else
         echo "Deferral file does NOT exist. Skipping plist deletion."
     fi
@@ -98,7 +98,7 @@ else
             echo "First then $DIALOG and $CURRENT_DEFERRAL_COUNT"
             echo "User chose $BUTTON2 so deferring install."
             CURRENT_DEFERRAL_COUNT=$((CURRENT_DEFERRAL_COUNT + 1))
-            defaults write "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" 'CurrentDeferralCount' "$CURRENT_DEFERRAL_COUNT"
+            defaults write "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" 'CurrentDeferralCount' "$CURRENT_DEFERRAL_COUNT"
             exit 1
         else
             echo "First else $DIALOG and $CURRENT_DEFERRAL_COUNT"
@@ -112,10 +112,10 @@ else
                 "$JAMF_BINARY" policy -event "$POLICY_TRIGGER_NAME"
                 # Add message it's safe to re-open app.
                 /bin/launchctl asuser "$USER_ID" /usr/bin/sudo -u "$CURRENT_USER" "$JAMF_HELPER" -windowType utility -windowPosition lr -title "$TITLE2" -description "$DESCRIPTION2" -icon "$LOGO" -button1 "$BUTTON1" -defaultButton "1"
-                if [ -e "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" ]
+                if [ -e "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" ]
                 then
                     echo "Deferral file exists and needs removed."
-                    rm -rf "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" 
+                    rm -rf "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" 
                 else
                     echo "Deferral file does NOT exist. Skipping plist deletion."
                 fi
@@ -129,10 +129,10 @@ else
                 "$JAMF_BINARY" policy -event "$POLICY_TRIGGER_NAME"
                 # Add message it's safe to re-open app.
                 /bin/launchctl asuser "$USER_ID" /usr/bin/sudo -u "$CURRENT_USER" "$JAMF_HELPER" -windowType utility -windowPosition lr -title "$TITLE2" -description "$DESCRIPTION2" -icon "$LOGO" -button1 "$BUTTON1" -defaultButton "1"
-                if [ -e "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" ]
+                if [ -e "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" ]
                 then
                     echo "Deferral file exists and needs removed."
-                    rm -rf "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist" 
+                    rm -rf "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist" 
                 else
                     echo "Deferral file does NOT exist. Skipping plist deletion."
                 fi
@@ -149,7 +149,7 @@ else
             "$JAMF_BINARY" policy -event "$POLICY_TRIGGER_NAME"
             # Add message it's safe to re-open app.
             /bin/launchctl asuser "$USER_ID" /usr/bin/sudo -u "$CURRENT_USER" "$JAMF_HELPER" -windowType utility -windowPosition lr -title "$TITLE2" -description "$DESCRIPTION2" -icon "$LOGO" -button1 "$BUTTON1" -defaultButton "1"
-            rm -rf "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist"
+            rm -rf "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist"
             "$JAMF_BINARY" recon
         else
             kill -9 "$APP_PROCESS_ID"
@@ -157,7 +157,7 @@ else
             "$JAMF_BINARY" policy -event "$POLICY_TRIGGER_NAME"
             # Add message it's safe to re-open app.
             /bin/launchctl asuser "$USER_ID" /usr/bin/sudo -u "$CURRENT_USER" "$JAMF_HELPER" -windowType utility -windowPosition lr -title "$TITLE2" -description "$DESCRIPTION2" -icon "$LOGO" -button1 "$BUTTON1" -defaultButton "1"
-            rm -rf "/Library/Application Support/HeartlandAEA11/Reporting/${APP_NAME} Deferral.plist"
+            rm -rf "/Library/Management/PCC/Reports/${APP_NAME} Deferral.plist"
             "$JAMF_BINARY" recon
         fi
     fi
